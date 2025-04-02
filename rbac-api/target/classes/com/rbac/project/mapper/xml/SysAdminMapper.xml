@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rbac.project.mapper.SysAdminMapper">
+    <select id="querySysAdminPageList" resultType="com.rbac.project.entity.vo.QuerySysAdminVo">
+        SELECT
+            sa.id,
+            sa.dept_id,
+            ( SELECT dept_name FROM sys_dept WHERE id = sa.dept_id ) AS deptName,
+            sa.post_id,
+            ( SELECT post_name FROM sys_post WHERE id = sa.post_id ) AS postName,
+            sa.username,
+            sa.email,
+            sa.phone,
+            sa.nickname,
+            sa.sex,
+            sa.icon,
+            sa.status,
+            sa.create_time,
+            sa.note,
+            IFNULL( ( SELECT role_name FROM sys_role WHERE id IN ( SELECT role_id FROM sys_admin_role WHERE admin_id = sa.id ) ), '暂未角色' ) AS roleName
+        FROM
+            sys_admin sa
+        WHERE 1=1
+            <if test="querySysAdminDto.username != null and querySysAdminDto.username != ''">
+                AND sa.username LIKE CONCAT('%', #{querySysAdminDto.username}, '%')
+            </if>
+            <if test="querySysAdminDto.status != null and querySysAdminDto.status != ''">
+                AND sa.status = #{querySysAdminDto.status}
+            </if>
+            <if test="querySysAdminDto.beginTime != null and querySysAdminDto.beginTime != '' and querySysAdminDto.endTime != null and querySysAdminDto.endTime != ''">
+                AND (sa.create_time BETWEEN CONCAT(#{querySysAdminDto.beginTime}, ' 00:00:00') AND CONCAT(#{querySysAdminDto.endTime}, ' 23:59:59'))
+            </if>
+    </select>
+
+    <select id="querySysAdminVoById" resultType="com.rbac.project.entity.vo.SysAdminVo">
+        SELECT
+            sa.id,
+            sa.dept_id as deptId ,
+            sa.post_id as postId,
+            sar.role_id as roleId,
+            sa.username,
+            sa.nickname,
+            sa.email,
+            sa.phone,
+            sa.sex,
+            sa.status,
+            sa.note
+        FROM
+            sys_admin sa
+                LEFT JOIN sys_admin_role sar ON sa.id = sar.admin_id
+        WHERE sa.id = #{id}
+    </select>
+
+    <select id="queryValuesList" resultType="string">
+        SELECT
+            sm.value
+        FROM
+            sys_menu sm
+                LEFT JOIN sys_role_menu srm ON sm.id = srm.menu_id
+                LEFT JOIN sys_role sr ON sr.id = srm.role_id
+                LEFT JOIN sys_admin_role sar ON sar.role_id = sr.id
+                LEFT JOIN sys_admin sa ON sa.id = sar.admin_id
+        WHERE
+            sm.menu_status = 2
+          AND sr.status = 1
+          AND sm.menu_type = 3
+          AND sa.id = #{id}
+    </select>
+
+    <select id="menuList" resultType="com.rbac.project.entity.vo.SysMenuTwoVo">
+        SELECT
+            sm.menu_name as menuName,
+            sm.url,
+            sm.icon
+        FROM
+            sys_menu sm LEFT JOIN sys_role_menu srm on srm.menu_id = sm.id
+                        LEFT JOIN sys_role sr on sr.id = srm.role_id
+                        LEFT JOIN sys_admin_role sar on sar.role_id = sr.id
+                        LEFT JOIN sys_admin sa on sa.id = sar.admin_id
+        WHERE sm.menu_status  = 2
+          AND sr.status = 1
+          AND sa.id = #{id}
+          AND sm.parent_id = #{menuId}
+        ORDER BY sm.sort ASC
+    </select>
+
+    <select id="treeList" resultType="com.rbac.project.entity.vo.SysMenuOneVo">
+        SELECT
+            sm.id,
+            sm.menu_name AS menuName,
+            sm.url,
+            sm.icon
+        FROM
+            sys_menu sm
+                LEFT JOIN sys_role_menu srm ON srm.menu_id = sm.id
+                LEFT JOIN sys_role sr ON sr.id = srm.role_id
+                LEFT JOIN sys_admin_role sar ON sar.role_id = sr.id
+                LEFT JOIN sys_admin sa ON sa.id = sar.admin_id
+        WHERE
+            sm.menu_status = 2
+          AND sr.`status` = 1
+          AND sm.menu_type = 1
+          AND sa.id = #{id}
+        ORDER BY sm.sort ASC
+    </select>
+</mapper>

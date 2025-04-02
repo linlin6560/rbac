@@ -1,0 +1,11 @@
+{
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-1.8",
+            "path": "D:\\bijiben_beifen\\JavaSoftware\\java-1.8.0-openjdk-1.8.0.392-1.b08.redhat.windows.x86_64",
+            "default": true
+        }
+    ],
+    "java.jdt.ls.java.home": "D:\\bijiben_beifen\\JavaSoftware\\java-1.8.0-openjdk-1.8.0.392-1.b08.redhat.windows.x86_64"
+}

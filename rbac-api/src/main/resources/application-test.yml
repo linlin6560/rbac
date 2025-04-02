@@ -1,0 +1,87 @@
+# 数据源配置
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://test:3306/rbac-api?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    druid:
+      #初始连接数
+      initialSize: 5
+      #最小连接池数量
+      minIdle: 10
+      #最大连接池数量
+      maxActive: 20
+      #配置获取连接等待超时的时间
+      maxWait: 60000
+      #配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      timeBetweenEvictionRunsMillis: 60000
+      #配置一个连接在池中最小生存的时间，单位是毫秒
+      minEvictableIdleTimeMillis: 300000
+      #配置一个连接在池中最大生存的时间，单位是毫秒
+      maxEvictableIdleTimeMillis: 900000
+      #配置检测连接是否有效
+      validationQuery: SELECT 1 FROM DUAL
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      webStatFilter:
+        enabled: true
+      statViewServlet:
+        enabled: true
+        #设置白名单，不填则允许所有访问
+        allow:
+        url-pattern: /druid/*
+        #控制台管理用户名和密码
+        login-username: admin
+        login-password: admin
+      filter:
+        stat:
+          enabled: true
+          #慢SQL记录
+          log-slow-sql: true
+          slow-sql-millis: 1000
+          merge-sql: true
+        wall:
+          config:
+            multi-statement-allow: true
+
+  # redis配置
+  redis:
+    #Redis服务器地址
+    host: test
+    #Redis数据库索引（默认为0）
+    database: 8
+    #Redis服务器连接端口（线上环境配置不常用端口，避免挖矿）
+    port: 6379
+    #Redis服务器连接密码（线上环境密码设置复杂点，避免挖矿）
+    password: 
+    #连接超时时间（毫秒）
+    timeout: 300ms
+
+# mybatis-plus配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    auto-mapping-behavior: full
+    # 控制台打印日志（开发环境和测试环境开放，生成环境关闭）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath*:**/xml/**.xml
+  global-config:
+    #逻辑删除配置
+    db-config:
+      #删除前
+      logic-not-delete-value: 1
+      #删除后
+      logic-delete-value: 0
+
+# api接口路径前缀地址
+server:
+  servlet:
+    context-path: /api/test
+
+# 图片路径 本地地址
+cbs:
+  uploadIp: http://test:3001
+  imagesPath: /rbac/rbac-api/
